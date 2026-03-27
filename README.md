@@ -17,7 +17,10 @@
 
 Source Hub is a lightweight yet powerful desktop app designed for video editors, producers, and creative professionals who need to organize, manage, and access media assets efficiently. With support for projects, collections, and intelligent asset management, Source Hub streamlines the workflow from file import to production.
 
-<img width="1917" height="986" alt="image" src="https://github.com/user-attachments/assets/bc90438e-154f-4c1e-b3d9-077cd9e95c65" />
+<figure align="center">
+	<img width="1917" height="986" alt="Source Hub dashboard overview" src="https://github.com/user-attachments/assets/bc90438e-154f-4c1e-b3d9-077cd9e95c65" />
+	<figcaption><em>Dashboard overview with projects, collections, and quick controls.</em></figcaption>
+</figure>
 
 ### Key Features
 
@@ -30,11 +33,20 @@ Source Hub is a lightweight yet powerful desktop app designed for video editors,
 - **Local Database** – All data stored locally using SQLite3 for privacy and offline access
 - **Windows Installer** – Professional NSIS-based installer for easy deployment
 
-<img width="1913" height="982" alt="image" src="https://github.com/user-attachments/assets/3099b8cd-16ae-47c8-923a-0085b2afadbc" />
+<figure align="center">
+	<img width="1913" height="982" alt="Source Hub project details view" src="https://github.com/user-attachments/assets/3099b8cd-16ae-47c8-923a-0085b2afadbc" />
+	<figcaption><em>Project details view with asset list, filters, and bulk actions.</em></figcaption>
+</figure>
 
-<img width="1919" height="988" alt="image" src="https://github.com/user-attachments/assets/28c68850-7f7b-4604-8c91-7ddfcbf140ba" />
+<figure align="center">
+	<img width="1919" height="988" alt="Source Hub collections screen" src="https://github.com/user-attachments/assets/28c68850-7f7b-4604-8c91-7ddfcbf140ba" />
+	<figcaption><em>Collections screen for organizing media across multiple projects.</em></figcaption>
+</figure>
 
-<img width="1919" height="984" alt="image" src="https://github.com/user-attachments/assets/376c56c2-39be-4dde-a1a8-6900984e858e" />
+<figure align="center">
+	<img width="1919" height="984" alt="Source Hub settings panel" src="https://github.com/user-attachments/assets/376c56c2-39be-4dde-a1a8-6900984e858e" />
+	<figcaption><em>Settings panel with paths, update controls, and performance options.</em></figcaption>
+</figure>
 
 ## System Requirements
 
