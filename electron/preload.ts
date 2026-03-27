@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld('sourceHubApi', {
   getLibraryRoot: () => ipcRenderer.invoke('library:get-root'),
   getFolderSettings: () => ipcRenderer.invoke('settings:get-folders'),
   getUpdatePreferences: () => ipcRenderer.invoke('settings:get-update-preferences'),
+  getAppMeta: () => ipcRenderer.invoke('app:get-meta'),
   setRealtimeWatchEnabled: (enabled: boolean) => ipcRenderer.invoke('settings:set-realtime-watch', enabled),
   setAutoUpdateEnabled: (enabled: boolean) => ipcRenderer.invoke('settings:set-auto-update', enabled),
   setLibraryRoot: (folderPath: string | null) => ipcRenderer.invoke('settings:set-library-root', folderPath),

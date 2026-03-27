@@ -1,7 +1,7 @@
 {
   "name": "source-hub",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Source Hub desktop app for media asset management.",
   "author": "HyIsNoob",
   "type": "module",

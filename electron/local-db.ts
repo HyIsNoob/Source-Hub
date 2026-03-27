@@ -92,6 +92,15 @@ interface LocalDbOptions {
   seedDemoData?: boolean
 }
 
+const DEMO_PROJECT_NAMES = ['Launch Teaser 2026', 'Gaming Shorts Batch A', 'Vlog Series Episode 17']
+const DEMO_COLLECTION_NAMES = [
+  'SFX - Transitions',
+  'Music - Tension Build',
+  'Overlay - Film Grain',
+  'B-Roll - City Night',
+]
+const DEMO_PIPELINE_NAMES = ['Scan folders', 'Detect duplicates', 'Tag suggestions', 'Link to projects']
+
 const formatBytes = (sizeBytes: number) => {
   const units = ['B', 'KB', 'MB', 'GB', 'TB']
   let value = sizeBytes
@@ -331,9 +340,85 @@ export class LocalDb {
       this.db
         .prepare('INSERT INTO app_metrics (metric_key, metric_value) VALUES (?, ?)')
         .run('relink_success', '94.8')
+
+      this.setSetting('demo_seeded', '1')
     })
 
     tx()
+  }
+
+  clearSeedDataIfPresent() {
+    if (this.getSetting('demo_seed_cleaned') === '1') {
+      return false
+    }
+
+    const demoSeededFlag = this.getSetting('demo_seeded')
+    const relinkMetric = this.getSetting('relink_success')
+    const shouldEvaluate = demoSeededFlag === '1' || relinkMetric === '94.8'
+
+    if (!shouldEvaluate) {
+      return false
+    }
+
+    const projectRows = this.db.prepare('SELECT id, name FROM projects').all() as Array<{ id: number; name: string }>
+    if (projectRows.length === 0) {
+      this.setSetting('demo_seeded', null)
+      return false
+    }
+
+    const hasOnlyDemoProjects =
+      projectRows.length === DEMO_PROJECT_NAMES.length &&
+      projectRows.every((row) => DEMO_PROJECT_NAMES.includes(row.name))
+
+    if (!hasOnlyDemoProjects) {
+      return false
+    }
+
+    const collectionRows = this.db.prepare('SELECT name FROM collections').all() as Array<{ name: string }>
+    const hasOnlyDemoCollections =
+      collectionRows.length === DEMO_COLLECTION_NAMES.length &&
+      collectionRows.every((row) => DEMO_COLLECTION_NAMES.includes(row.name))
+
+    if (!hasOnlyDemoCollections) {
+      return false
+    }
+
+    const pipelineRows = this.db
+      .prepare('SELECT name FROM import_pipeline ORDER BY ordering ASC')
+      .all() as Array<{ name: string }>
+    const hasOnlyDemoPipeline =
+      pipelineRows.length === DEMO_PIPELINE_NAMES.length &&
+      pipelineRows.every((row) => DEMO_PIPELINE_NAMES.includes(row.name))
+
+    if (!hasOnlyDemoPipeline) {
+      return false
+    }
+
+    const hasExternalSourceAssets = this.db
+      .prepare(
+        `SELECT COUNT(*) AS total
+         FROM assets
+         WHERE source_path IS NOT NULL AND TRIM(source_path) <> ''`
+      )
+      .get() as { total: number }
+
+    if (hasExternalSourceAssets.total > 0) {
+      return false
+    }
+
+    const clearTx = this.db.transaction(() => {
+      this.db.prepare('DELETE FROM collection_assets').run()
+      this.db.prepare('DELETE FROM assets').run()
+      this.db.prepare('DELETE FROM import_pipeline').run()
+      this.db.prepare('DELETE FROM collections').run()
+      this.db.prepare('DELETE FROM projects').run()
+      this.setSetting('relink_success', null)
+      this.setSetting('demo_seeded', null)
+      this.setSetting('demo_seed_cleaned', '1')
+    })
+
+    clearTx()
+    return true
   }
 
   getDashboardData(): DashboardData {

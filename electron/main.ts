@@ -494,6 +494,14 @@ const registerIpcHandlers = () => {
     return checkLatestRelease()
   })
 
+  ipcMain.handle('app:get-meta', () => {
+    return {
+      name: app.getName(),
+      version: app.getVersion(),
+      packaged: app.isPackaged,
+    }
+  })
+
   ipcMain.handle('folders:open', async (_event, folderPath: string) => {
     if (!folderPath || folderPath.trim().length === 0) {
       throw new Error('Folder path is required')
@@ -757,9 +765,18 @@ const createWindow = () => {
 app.disableHardwareAcceleration()
 
 app.whenReady().then(() => {
+  const seedDemoData = isDev || process.env.SOURCE_HUB_SEED_DEMO === '1'
   localDb = new LocalDb(app.getPath('userData'), {
-    seedDemoData: isDev || process.env.SOURCE_HUB_SEED_DEMO === '1',
+    seedDemoData,
   })
+
+  if (!seedDemoData) {
+    const clearedDemoData = localDb.clearSeedDataIfPresent()
+    if (clearedDemoData) {
+      console.info('Cleared legacy demo data from production database')
+    }
+  }
+
   registerIpcHandlers()
   refreshRealtimeWatchers()
   const mainWindow = createWindow()

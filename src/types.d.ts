@@ -77,6 +77,12 @@ interface UpdateCheckResult {
   releaseNotes: string
 }
 
+interface AppMeta {
+  name: string
+  version: string
+  packaged: boolean
+}
+
 interface CollectionDetails {
   id: number
   name: string
@@ -96,6 +102,7 @@ interface SourceHubApi {
   getLibraryRoot: () => Promise<string>
   getFolderSettings: () => Promise<FolderSettings>
   getUpdatePreferences: () => Promise<UpdatePreferences>
+  getAppMeta: () => Promise<AppMeta>
   setRealtimeWatchEnabled: (enabled: boolean) => Promise<FolderSettings>
   setAutoUpdateEnabled: (enabled: boolean) => Promise<UpdatePreferences>
   setLibraryRoot: (folderPath: string | null) => Promise<FolderSettings>

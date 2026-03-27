@@ -442,6 +442,7 @@ function App() {
   const [realtimeWatchEnabled, setRealtimeWatchEnabled] = useState(false)
   const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true)
   const [isCheckingUpdates, setIsCheckingUpdates] = useState(false)
+  const [appMeta, setAppMeta] = useState<AppMeta | null>(null)
   const [projectListScrollTop, setProjectListScrollTop] = useState(0)
   const [collectionListScrollTop, setCollectionListScrollTop] = useState(0)
   const [projectListViewportHeight, setProjectListViewportHeight] = useState(420)
@@ -487,6 +488,13 @@ function App() {
     const preferences = await window.sourceHubApi?.getUpdatePreferences()
     if (preferences) {
       setAutoUpdateEnabled(preferences.autoUpdateEnabled)
+    }
+  }
+
+  const loadAppMeta = async () => {
+    const metadata = await window.sourceHubApi?.getAppMeta()
+    if (metadata) {
+      setAppMeta(metadata)
     }
   }
 
@@ -571,6 +579,7 @@ function App() {
     loadDashboardData()
     loadFolderSettings()
     void loadUpdatePreferences()
+    void loadAppMeta()
 
     let frame = 0
     const interval = setInterval(() => {
@@ -2142,6 +2151,18 @@ function App() {
                           <span>Thumb Cache: {Object.keys(thumbnailMap).length}</span>
                           <span>Project Visible Rows: {projectVisibleAssets.length}</span>
                           <span>Collection Visible Rows: {collectionVisibleAssets.length}</span>
+                        </div>
+                      </div>
+
+                      <div className="settings-card">
+                        <h3 className="settings-title-with-icon">
+                          <MonoIcon name="settings" className="mono-icon settings-title-icon" />
+                          <span>APP_INFO</span>
+                        </h3>
+                        <div className="settings-diagnostics-list">
+                          <span>Name: {appMeta?.name ?? 'Source Hub'}</span>
+                          <span>Version: {appMeta?.version ?? 'Unknown'}</span>
+                          <span>Build: {appMeta?.packaged ? 'Production' : 'Development'}</span>
                         </div>
                       </div>
 
