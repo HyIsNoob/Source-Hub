@@ -38,10 +38,14 @@ Source Hub is a lightweight yet powerful desktop app designed for video editors,
 	<figcaption><em>Project details view with asset list, filters, and bulk actions.</em></figcaption>
 </figure>
 
+<br/>
+
 <figure align="center">
 	<img width="1919" height="988" alt="Source Hub collections screen" src="https://github.com/user-attachments/assets/28c68850-7f7b-4604-8c91-7ddfcbf140ba" />
 	<figcaption><em>Collections screen for organizing media across multiple projects.</em></figcaption>
 </figure>
+
+<br/>
 
 <figure align="center">
 	<img width="1919" height="984" alt="Source Hub settings panel" src="https://github.com/user-attachments/assets/376c56c2-39be-4dde-a1a8-6900984e858e" />

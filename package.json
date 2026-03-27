@@ -1,7 +1,9 @@
 {
   "name": "source-hub",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
+  "description": "Source Hub desktop app for media asset management.",
+  "author": "HyIsNoob",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -66,7 +68,7 @@
       "favicon.ico"
     ],
     "win": {
-      "icon": "favicon.ico",
+      "icon": "icon.png",
       "target": [
         {
           "target": "nsis",
