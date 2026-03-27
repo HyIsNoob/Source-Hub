@@ -12,6 +12,22 @@ let localDb: LocalDb | null = null
 const projectWatchers = new Map<number, fs.FSWatcher>()
 const watcherDebounceTimers = new Map<number, NodeJS.Timeout>()
 
+const LATEST_RELEASE_API = 'https://api.github.com/repos/HyIsNoob/Source-Hub/releases/latest'
+
+interface UpdateCheckResult {
+  hasUpdate: boolean
+  currentVersion: string
+  latestVersion: string
+  releaseUrl: string
+  releaseNotes: string
+}
+
+interface LatestReleasePayload {
+  tag_name?: string
+  html_url?: string
+  body?: string
+}
+
 const MEDIA_EXTENSIONS = new Set([
   'mp4',
   'mov',
@@ -40,6 +56,58 @@ const getTypeFolderName = (mediaType: string) => {
   if (mediaType === 'audio') return 'audio'
   if (mediaType === 'image') return 'images'
   return 'others'
+}
+
+const normalizeVersion = (value: string) => value.trim().replace(/^v/i, '')
+
+const compareSemver = (left: string, right: string) => {
+  const l = normalizeVersion(left).split('.').map((part) => Number(part) || 0)
+  const r = normalizeVersion(right).split('.').map((part) => Number(part) || 0)
+  const maxLength = Math.max(l.length, r.length)
+
+  for (let index = 0; index < maxLength; index += 1) {
+    const lPart = l[index] ?? 0
+    const rPart = r[index] ?? 0
+    if (lPart > rPart) return 1
+    if (lPart < rPart) return -1
+  }
+
+  return 0
+}
+
+const getAutoUpdateEnabled = () => {
+  const configured = localDb?.getSetting('auto_update_enabled')
+  if (configured === null) {
+    return true
+  }
+
+  return configured === '1'
+}
+
+const checkLatestRelease = async (): Promise<UpdateCheckResult> => {
+  const response = await fetch(LATEST_RELEASE_API, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'Source-Hub-Updater',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error(`Update check failed: HTTP ${response.status}`)
+  }
+
+  const payload = (await response.json()) as LatestReleasePayload
+  const currentVersion = normalizeVersion(app.getVersion())
+  const latestVersion = normalizeVersion(payload.tag_name || currentVersion)
+  const hasUpdate = compareSemver(latestVersion, currentVersion) > 0
+
+  return {
+    hasUpdate,
+    currentVersion,
+    latestVersion,
+    releaseUrl: payload.html_url || 'https://github.com/HyIsNoob/Source-Hub/releases/latest',
+    releaseNotes: payload.body || '',
+  }
 }
 
 const sanitizeSegment = (value: string) => {
@@ -128,6 +196,14 @@ const resolveProjectManagedFolder = (projectName: string) => {
   const projectDir = join(resolveLibraryRoot(), 'projects', projectSegment)
   fs.mkdirSync(projectDir, { recursive: true })
   return projectDir
+}
+
+const resolveWindowIconPath = () => {
+  if (isDev) {
+    return join(app.getAppPath(), 'favicon.ico')
+  }
+
+  return join(process.resourcesPath, 'favicon.ico')
 }
 
 const ingestFolderIntoProject = (projectId: number, sourceFolder: string) => {
@@ -397,6 +473,27 @@ const registerIpcHandlers = () => {
     }
   })
 
+  ipcMain.handle('settings:get-update-preferences', () => {
+    return {
+      autoUpdateEnabled: getAutoUpdateEnabled(),
+    }
+  })
+
+  ipcMain.handle('settings:set-auto-update', (_event, enabled: boolean) => {
+    if (!localDb) {
+      throw new Error('Database not initialized')
+    }
+
+    localDb.setSetting('auto_update_enabled', enabled ? '1' : '0')
+    return {
+      autoUpdateEnabled: getAutoUpdateEnabled(),
+    }
+  })
+
+  ipcMain.handle('updates:check', async () => {
+    return checkLatestRelease()
+  })
+
   ipcMain.handle('folders:open', async (_event, folderPath: string) => {
     if (!folderPath || folderPath.trim().length === 0) {
       throw new Error('Folder path is required')
@@ -413,6 +510,15 @@ const registerIpcHandlers = () => {
     }
 
     return true
+  })
+
+  ipcMain.handle('links:open-external', async (_event, targetUrl: string) => {
+    try {
+      await shell.openExternal(targetUrl)
+      return true
+    } catch {
+      return false
+    }
   })
 
   ipcMain.handle('folders:pick', async () => {
@@ -618,6 +724,7 @@ const createWindow = () => {
     backgroundColor: '#f4f4f0',
     autoHideMenuBar: true,
     titleBarStyle: 'hiddenInset',
+    icon: resolveWindowIconPath(),
     webPreferences: {
       preload: join(__dirname, 'preload.mjs'),
       contextIsolation: true,
@@ -634,7 +741,7 @@ const createWindow = () => {
       mainWindow.maximize()
       mainWindow.show()
     })
-    return
+    return mainWindow
   }
 
   mainWindow.loadFile(join(__dirname, '../dist/index.html'))
@@ -642,6 +749,8 @@ const createWindow = () => {
     mainWindow.maximize()
     mainWindow.show()
   })
+
+  return mainWindow
 }
 
 // Fix for AMD GPU bug
@@ -653,7 +762,35 @@ app.whenReady().then(() => {
   })
   registerIpcHandlers()
   refreshRealtimeWatchers()
-  createWindow()
+  const mainWindow = createWindow()
+
+  if (getAutoUpdateEnabled()) {
+    void checkLatestRelease()
+      .then((result) => {
+        if (!result.hasUpdate) {
+          return
+        }
+
+        void dialog
+          .showMessageBox(mainWindow, {
+            type: 'info',
+            title: 'Source Hub Update Available',
+            message: `A new version is available (${result.latestVersion}).`,
+            detail: `Current: ${result.currentVersion}\nLatest: ${result.latestVersion}`,
+            buttons: ['Open Release Page', 'Later'],
+            defaultId: 0,
+            cancelId: 1,
+          })
+          .then((selection) => {
+            if (selection.response === 0) {
+              void shell.openExternal(result.releaseUrl)
+            }
+          })
+      })
+      .catch((error) => {
+        console.error('Auto-update check failed:', error)
+      })
+  }
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {

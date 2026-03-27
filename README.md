@@ -4,7 +4,9 @@
 
 > Built with Electron, React, and TypeScript for high-performance asset management workflows.
 
-![Screenshot placeholder - Main interface](https://via.placeholder.com/1200x700?text=Source+Hub+Main+Interface)
+<p align="center">
+	<img src="./icon.png" alt="Source Hub Logo" width="220" />
+</p>
 
 ## Overview
 
@@ -35,7 +37,7 @@ Source Hub is a lightweight yet powerful desktop app designed for video editors,
 ## Installation & Quick Start
 
 ### For Users
-Download the latest installer from [GitHub Releases](https://github.com/HyIsNoob/Editing-Manager/releases) and run `Source Hub-Setup-*.exe`.
+Download the latest installer from [GitHub Releases](https://github.com/HyIsNoob/Source-Hub/releases) and run `Source Hub-Setup-*.exe`.
 
 ## Project Structure
 

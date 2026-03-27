@@ -65,6 +65,18 @@ interface FolderSettings {
   realtimeWatchEnabled: boolean
 }
 
+interface UpdatePreferences {
+  autoUpdateEnabled: boolean
+}
+
+interface UpdateCheckResult {
+  hasUpdate: boolean
+  currentVersion: string
+  latestVersion: string
+  releaseUrl: string
+  releaseNotes: string
+}
+
 interface CollectionDetails {
   id: number
   name: string
@@ -83,9 +95,13 @@ interface SourceHubApi {
   getCollectionDetails: (id: number) => Promise<CollectionDetails>
   getLibraryRoot: () => Promise<string>
   getFolderSettings: () => Promise<FolderSettings>
+  getUpdatePreferences: () => Promise<UpdatePreferences>
   setRealtimeWatchEnabled: (enabled: boolean) => Promise<FolderSettings>
+  setAutoUpdateEnabled: (enabled: boolean) => Promise<UpdatePreferences>
   setLibraryRoot: (folderPath: string | null) => Promise<FolderSettings>
   setWorkspaceRoot: (folderPath: string | null) => Promise<FolderSettings>
+  checkForUpdates: () => Promise<UpdateCheckResult>
+  openExternal: (targetUrl: string) => Promise<boolean>
   pickFolder: () => Promise<string | null>
   openFolder: (folderPath: string) => Promise<boolean>
   importAssets: (projectId: number) => Promise<ProjectDetails | null>

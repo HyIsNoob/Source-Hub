@@ -1,7 +1,7 @@
 {
   "name": "source-hub",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "main": "dist-electron/main.js",
   "scripts": {
@@ -62,7 +62,11 @@
     "asarUnpack": [
       "node_modules/better-sqlite3/**"
     ],
+    "extraResources": [
+      "favicon.ico"
+    ],
     "win": {
+      "icon": "favicon.ico",
       "target": [
         {
           "target": "nsis",

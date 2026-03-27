@@ -440,6 +440,8 @@ function App() {
   const [libraryRootPath, setLibraryRootPath] = useState('')
   const [workspaceRootPath, setWorkspaceRootPath] = useState<string | null>(null)
   const [realtimeWatchEnabled, setRealtimeWatchEnabled] = useState(false)
+  const [autoUpdateEnabled, setAutoUpdateEnabled] = useState(true)
+  const [isCheckingUpdates, setIsCheckingUpdates] = useState(false)
   const [projectListScrollTop, setProjectListScrollTop] = useState(0)
   const [collectionListScrollTop, setCollectionListScrollTop] = useState(0)
   const [projectListViewportHeight, setProjectListViewportHeight] = useState(420)
@@ -481,6 +483,13 @@ function App() {
     }
   }
 
+  const loadUpdatePreferences = async () => {
+    const preferences = await window.sourceHubApi?.getUpdatePreferences()
+    if (preferences) {
+      setAutoUpdateEnabled(preferences.autoUpdateEnabled)
+    }
+  }
+
   const handleToggleRealtimeWatch = async () => {
     try {
       const settings = await window.sourceHubApi?.setRealtimeWatchEnabled(!realtimeWatchEnabled)
@@ -493,6 +502,48 @@ function App() {
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to toggle realtime watch'
       window.alert(message)
+    }
+  }
+
+  const handleToggleAutoUpdate = async () => {
+    try {
+      const preferences = await window.sourceHubApi?.setAutoUpdateEnabled(!autoUpdateEnabled)
+      if (preferences) {
+        setAutoUpdateEnabled(preferences.autoUpdateEnabled)
+        pushActivity(`Auto update ${preferences.autoUpdateEnabled ? 'enabled' : 'disabled'}`)
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to toggle auto update'
+      window.alert(message)
+    }
+  }
+
+  const handleCheckForUpdates = async () => {
+    try {
+      setIsCheckingUpdates(true)
+      const result = await window.sourceHubApi?.checkForUpdates()
+      if (!result) {
+        return
+      }
+
+      if (result.hasUpdate) {
+        const openRelease = window.confirm(
+          `New update available: ${result.latestVersion}\nCurrent version: ${result.currentVersion}\n\nOpen release page now?`
+        )
+        if (openRelease) {
+          await window.sourceHubApi?.openExternal(result.releaseUrl)
+        }
+        pushActivity(`Update available: ${result.latestVersion}`)
+        return
+      }
+
+      window.alert(`You are up to date. Current version: ${result.currentVersion}`)
+      pushActivity(`Update check complete: ${result.currentVersion}`)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to check updates'
+      window.alert(message)
+    } finally {
+      setIsCheckingUpdates(false)
     }
   }
 
@@ -519,6 +570,7 @@ function App() {
 
     loadDashboardData()
     loadFolderSettings()
+    void loadUpdatePreferences()
 
     let frame = 0
     const interval = setInterval(() => {
@@ -1672,7 +1724,7 @@ function App() {
           </button>
 
           <div className="brand-section">
-            <h1>{isSidebarCollapsed ? 'S' : 'SH'}</h1>
+            <h1>{isSidebarCollapsed ? 'SH' : 'SourceHub'}</h1>
             {!isSidebarCollapsed && <p>ASSET CONTROL</p>}
           </div>
 
@@ -1941,6 +1993,28 @@ function App() {
                                 className="mono-icon inline-btn-icon"
                               />
                               <span>{realtimeWatchEnabled ? 'TURN_OFF' : 'TURN_ON'}</span>
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="settings-card">
+                        <h3 className="settings-title-with-icon">
+                          <MonoIcon name="bolt" className="mono-icon settings-title-icon" />
+                          <span>AUTO_UPDATE</span>
+                        </h3>
+                        <p>{autoUpdateEnabled ? 'ENABLED' : 'DISABLED'}</p>
+                        <div className="settings-actions-row">
+                          <button className="action-cut mini-cut" onClick={handleToggleAutoUpdate}>
+                            <span className="btn-inline-icon-wrap">
+                              <MonoIcon name={autoUpdateEnabled ? 'close' : 'check'} className="mono-icon inline-btn-icon" />
+                              <span>{autoUpdateEnabled ? 'TURN_OFF' : 'TURN_ON'}</span>
+                            </span>
+                          </button>
+                          <button className="action-cut mini-cut" onClick={handleCheckForUpdates} disabled={isCheckingUpdates}>
+                            <span className="btn-inline-icon-wrap">
+                              <MonoIcon name="activity" className="mono-icon inline-btn-icon" />
+                              <span>{isCheckingUpdates ? 'CHECKING...' : 'CHECK_UPDATE'}</span>
                             </span>
                           </button>
                         </div>
