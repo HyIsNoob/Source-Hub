@@ -1,12 +1,18 @@
-# Source Hub
+<div align="center">
+	<img src="./icon.png" alt="Source Hub Logo" width="120" />
 
-**A desktop application for managing media assets with advanced filtering, organization, and real-time synchronization.**
+	<h1>Source Hub</h1>
+	<p>Smart media asset management for creators — built with Electron, React, and local-first architecture.</p>
 
-> Built with Electron, React, and TypeScript for high-performance asset management workflows.
+	<p>
+		<a href="https://github.com/HyIsNoob/Source-Hub"><img alt="Repo" src="https://img.shields.io/badge/GitHub-Source--Hub-000?logo=github" /></a>
+		<img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue" />
+		<img alt="License" src="https://img.shields.io/badge/license-MIT-green" />
+		<img alt="Electron" src="https://img.shields.io/badge/Electron-41.x-47848F?logo=electron" />
+	</p>
+</div>
 
-<p align="center">
-	<img src="./icon.png" alt="Source Hub Logo" width="220" />
-</p>
+---
 
 ## Overview
 
