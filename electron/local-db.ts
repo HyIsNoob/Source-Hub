@@ -69,6 +69,25 @@ export interface ProjectWatchConfig {
   watchFolderPath: string
 }
 
+interface ProjectRow {
+  id: number
+  name: string
+  style: string
+  created_at: string
+  updated_at: string
+  watch_folder_path: string | null
+}
+
+interface AssetRow {
+  id: number
+  name: string
+  media_type: string
+  size_bytes: number
+  created_at: string
+  source_path: string | null
+  managed_path: string | null
+}
+
 interface LocalDbOptions {
   seedDemoData?: boolean
 }
@@ -109,7 +128,7 @@ export class LocalDb {
   private readonly seedDemoData: boolean
 
   constructor(userDataPath: string, options: LocalDbOptions = {}) {
-    const dbPath = join(userDataPath, 'editing-manager.db')
+    const dbPath = join(userDataPath, 'source-hub.db')
     this.db = new Database(dbPath)
     this.seedDemoData = options.seedDemoData ?? false
     this.db.pragma('journal_mode = WAL')
@@ -580,7 +599,7 @@ export class LocalDb {
   getProjectDetails(projectId: number): ProjectDetails {
     const project = this.db
       .prepare('SELECT * FROM projects WHERE id = ?')
-      .get(projectId) as any
+      .get(projectId) as ProjectRow | undefined
 
     if (!project) {
       throw new Error(`Project ${projectId} not found`)
@@ -588,7 +607,7 @@ export class LocalDb {
 
     const assets = this.db
       .prepare('SELECT * FROM assets WHERE project_id = ? ORDER BY created_at DESC')
-      .all(projectId) as any[]
+      .all(projectId) as AssetRow[]
 
     return {
       id: project.id,

@@ -42,12 +42,24 @@ const getTypeFolderName = (mediaType: string) => {
   return 'others'
 }
 
-const sanitizeSegment = (value: string) =>
-  value
+const sanitizeSegment = (value: string) => {
+  const forbidden = new Set(['<', '>', ':', '"', '/', '\\', '|', '?', '*'])
+  const sanitized = value
     .trim()
-    .replace(/[<>:"/\\|?*\x00-\x1F]/g, '_')
+    .split('')
+    .map((char) => {
+      if (forbidden.has(char) || char.charCodeAt(0) < 32) {
+        return '_'
+      }
+
+      return char
+    })
+    .join('')
     .replace(/\s+/g, '_')
-    .slice(0, 80) || 'untitled'
+    .slice(0, 80)
+
+  return sanitized || 'untitled'
+}
 
 const ensureUniqueFilePath = (targetDir: string, fileName: string) => {
   const ext = extname(fileName)

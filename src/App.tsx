@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './index.css'
 
 type MainTab = 'projects' | 'collections' | 'settings'
@@ -1411,7 +1411,7 @@ function App() {
     }
   }
 
-  const getFilteredAssets = (assets: AssetData[]) => {
+  const getFilteredAssets = useCallback((assets: AssetData[]) => {
     const query = debouncedAssetQuery.trim().toLowerCase()
     const tokens = query.length === 0 ? [] : query.split(/\s+/).filter(Boolean)
 
@@ -1456,7 +1456,7 @@ function App() {
     }
 
     return sorted
-  }
+  }, [assetSort, assetTypeFilter, debouncedAssetQuery])
 
   const paginateAssets = (assets: AssetData[], page: number) => {
     const totalPages = Math.max(1, Math.ceil(assets.length / ASSETS_PER_PAGE))
@@ -1468,11 +1468,11 @@ function App() {
 
   const projectAssets = useMemo(
     () => (projectDetails ? getFilteredAssets(projectDetails.assets) : []),
-    [projectDetails, debouncedAssetQuery, assetTypeFilter, assetSort]
+    [projectDetails, getFilteredAssets]
   )
   const collectionAssets = useMemo(
     () => (collectionDetails ? getFilteredAssets(collectionDetails.assets) : []),
-    [collectionDetails, debouncedAssetQuery, assetTypeFilter, assetSort]
+    [collectionDetails, getFilteredAssets]
   )
   const projectPagination = useMemo(() => paginateAssets(projectAssets, projectPage), [projectAssets, projectPage])
   const collectionPagination = useMemo(
@@ -2065,7 +2065,7 @@ function App() {
                         </h3>
                         <div className="settings-diagnostics-list">
                           <span>FPS: {fps}</span>
-                          <span>Thumb Cache: {thumbnailCacheRef.current.size}</span>
+                          <span>Thumb Cache: {Object.keys(thumbnailMap).length}</span>
                           <span>Project Visible Rows: {projectVisibleAssets.length}</span>
                           <span>Collection Visible Rows: {collectionVisibleAssets.length}</span>
                         </div>
