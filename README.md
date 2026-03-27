@@ -88,7 +88,6 @@ SOURCE_HUB_SEED_DEMO=1 npm run dist:win
 - **Thumbnail Caching**: First-run thumbnails are cached; updates invalidate cache entries
 - **IPC Security**: Preload script validates and filters all main ↔ renderer communication
 - **Local-First**: All data persists locally; no external API calls required
-```
 
 ## License
 
