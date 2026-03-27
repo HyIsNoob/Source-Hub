@@ -1,93 +1,206 @@
 # Source Hub
 
-Ứng dụng desktop quản lý media asset cho workflow edit video, xây dựng bằng Electron + React + TypeScript.
+**A desktop application for managing media assets with advanced filtering, organization, and real-time synchronization.**
 
-## Mục tiêu dự án
+> Built with Electron, React, and TypeScript for high-performance asset management workflows.
 
-Source Hub giúp gom và quản lý asset theo project/collection, hỗ trợ import nhanh, lọc/sắp xếp, xem trước danh sách lớn và phát hành dưới dạng app cài đặt Windows.
+![Screenshot placeholder - Main interface](https://via.placeholder.com/1200x700?text=Source+Hub+Main+Interface)
 
-## Cấu trúc repository
+## Overview
 
-Repository hiện đã được đưa toàn bộ mã nguồn lên root để hiển thị đúng trên GitHub.
+Source Hub is a lightweight yet powerful desktop app designed for video editors, producers, and creative professionals who need to organize, manage, and access media assets efficiently. With support for projects, collections, and intelligent asset management, Source Hub streamlines the workflow from file import to production.
 
-- `src`: UI React
-- `electron`: main process, preload, local database
-- `.github/workflows`: CI/CD build và publish release
-- `public`: static asset
+### Key Features
 
-## Yêu cầu môi trường
+- **Project & Collection Management** – Create projects to organize assets by category, and use collections for flexible grouping
+- **Fast Asset Import** – Drag-and-drop or batch import media files with automatic categorization
+- **Intelligent Filtering & Sorting** – Search, filter by media type, and sort by name, date, or file size
+- **Real-Time Synchronization** – Watch folders for automatic asset detection and updates
+- **Thumbnail Caching** – Quick preview generation with smart caching for performance
+- **Virtual List Rendering** – Seamless handling of thousands of assets without lag
+- **Local Database** – All data stored locally using SQLite3 for privacy and offline access
+- **Windows Installer** – Professional NSIS-based installer for easy deployment
 
-- Node.js 22+
-- npm 10+
-- Windows (khuyến nghị khi đóng gói installer `.exe`)
+![Screenshot placeholder - Project view](https://via.placeholder.com/1200x700?text=Source+Hub+Project+View)
+![Screenshot placeholder - Collections](https://via.placeholder.com/1200x700?text=Source+Hub+Collections)
 
-## Cài đặt và chạy local
+## System Requirements
+
+- **Node.js**: 22.x or higher
+- **npm**: 10.x or higher
+- **Operating System**: Windows 10 or later (for building installers)
+- **RAM**: 4GB minimum recommended
+- **Disk Space**: 200MB for app + dependencies
+
+## Installation & Quick Start
+
+### For Users
+Download the latest installer from [GitHub Releases](https://github.com/HyIsNoob/Editing-Manager/releases) and run `Source Hub-Setup-*.exe`.
+
+### For Developers
 
 ```bash
+# Clone repository
+git clone https://github.com/HyIsNoob/Editing-Manager.git
+cd Editing-Manager
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+The app will start in development mode with hot module reloading enabled.
+
+## Development Commands
+
+```bash
+npm run dev          # Start development environment with HMR
+npm run build        # Build frontend and Electron bundle
+npm run lint         # Run ESLint code quality checks
+npm run dist         # Package app bundle
+npm run dist:win     # Build Windows NSIS installer
+npm run rebuild-native  # Rebuild native modules (better-sqlite3)
+```
+
+## Building & Distribution
+
+### Development Build
+```bash
+npm run build
+```
+
+Output in `dist/` and `dist-electron/`
+
+### Production Installer
+```bash
+npm run dist:win
+```
+
+Generates Windows installer in `release/`:
+- `Source Hub-Setup-0.1.0.exe`
+- `Source Hub-Setup-0.1.0.exe.blockmap`
+
+## Release Process
+
+This project uses GitHub Actions for automated release builds. To publish a new version:
+
+1. **Update version** in `package.json`
+2. **Commit changes**:
+   ```bash
+   git add .
+   git commit -m "chore: bump version to v0.2.0"
+   ```
+3. **Create release tag**:
+   ```bash
+   git tag v0.2.0 -m "Release: Source Hub v0.2.0"
+   ```
+4. **Push to GitHub**:
+   ```bash
+   git push origin main
+   git push origin v0.2.0
+   ```
+
+GitHub Actions will automatically:
+- Install dependencies
+- Build the Windows installer
+- Upload artifacts
+- Create a GitHub Release with installer files
+
+Monitor progress at: [GitHub Actions](https://github.com/HyIsNoob/Editing-Manager/actions)
+
+## Project Structure
+
+```
+source-hub/
+├── src/                      # React UI components
+├── electron/                 # Electron main process & database
+│   ├── main.ts              # Electron app bootstrap & IPC
+│   ├── preload.ts           # Preload script for IPC security
+│   └── local-db.ts          # SQLite3 database management
+├── public/                   # Static assets (icons, images)
+├── .github/                  # CI/CD workflows
+│   └── workflows/
+│       └── release-windows.yml
+├── package.json             # Dependencies & scripts
+└── README.md                # This file
+```
+
+## Configuration
+
+### Environment Variables
+
+**Development Mode Demo Data**
+- Dev mode automatically seeds demo data by default
+- Production builds do not include demo data
+
+To force demo data in production:
+```bash
+SOURCE_HUB_SEED_DEMO=1 npm run dist:win
+```
+
+### Database
+
+- **Location**: `%APPDATA%/Source Hub/source-hub.db` (Windows)
+- **Type**: SQLite3 with WAL mode for concurrency
+- **Schema**: Auto-migrated on first run
+
+## Technologies
+
+- **Frontend**: React 19, TypeScript, Vite
+- **Backend**: Electron 41, Node.js
+- **Database**: better-sqlite3
+- **Build**: Vite + Electron Builder
+- **Styling**: Custom CSS with Neobrutalism design
+- **Linting**: ESLint + TypeScript ESLint
+
+## Architecture Notes
+
+- **Virtual List Rendering**: Large asset lists use virtualization to maintain 60 FPS performance
+- **Thumbnail Caching**: First-run thumbnails are cached; updates invalidate cache entries
+- **IPC Security**: Preload script validates and filters all main ↔ renderer communication
+- **Local-First**: All data persists locally; no external API calls required
+
+## Development Guidelines
+
+- **Code Style**: Follow ESLint rules; run `npm run lint` before commits
+- **Database Changes**: If modifying schema in `electron/local-db.ts`, test import/link/unlink flows
+- **Version Bumps**: Always update `package.json` version before creating a release tag
+- **Build Artifacts**: Never commit `dist/`, `dist-electron/`, or `release/` folders
+
+## Troubleshooting
+
+### Build Fails with `better-sqlite3` Error
+```bash
+npm run rebuild-native
+npm run build
+```
+
+### Dev Server Not Starting
+```bash
+rm -r node_modules dist dist-electron
 npm install
 npm run dev
 ```
 
-## Các lệnh quan trọng
-
+### Installer Build Issues
+Ensure Node.js 22+ and npm 10+ are installed:
 ```bash
-npm run dev
-npm run build
-npm run lint
-npm run dist
-npm run dist:win
+node --version  # Should be v22.x+
+npm --version   # Should be 10.x+
 ```
 
-Giải thích nhanh:
+## License
 
-- `dev`: chạy môi trường phát triển
-- `build`: build frontend + electron bundle
-- `lint`: kiểm tra code style/rule
-- `dist`: đóng gói app
-- `dist:win`: build installer NSIS cho Windows
+This project is open source and available under the MIT License.
 
-## Output khi build installer
+## Support & Feedback
 
-Sau khi chạy `npm run dist:win`, file sẽ nằm trong thư mục `release`:
+For issues, feature requests, or feedback:
+- Open an issue on [GitHub Issues](https://github.com/HyIsNoob/Editing-Manager/issues)
+- Check existing discussions in [GitHub Discussions](https://github.com/HyIsNoob/Editing-Manager/discussions)
 
-- `Source Hub-Setup-<version>.exe`
-- `Source Hub-Setup-<version>.exe.blockmap`
+---
 
-## Quy trình phát hành lên GitHub
-
-Repository đã có workflow: `.github/workflows/release-windows.yml`.
-
-Khi push tag dạng `v*` (ví dụ `v0.1.0`), GitHub Actions sẽ:
-
-1. Cài dependency
-2. Build installer Windows
-3. Upload artifact
-4. Tạo GitHub Release và đính kèm file cài đặt
-
-Lệnh publish cơ bản:
-
-```bash
-git add .
-git commit -m "release: v0.1.0"
-git tag v0.1.0
-git push origin main
-git push origin v0.1.0
-```
-
-## Dữ liệu demo trong production
-
-Mặc định bản production không tự seed dữ liệu demo.
-
-- Dev mode: có seed demo
-- Production: không seed demo
-- Có thể bật thủ công bằng biến môi trường:
-
-```bash
-SOURCE_HUB_SEED_DEMO=1
-```
-
-## Ghi chú cho phát triển
-
-- Tránh commit thư mục build (`dist`, `dist-electron`, `release`)
-- Nếu thay đổi schema hoặc logic DB trong `electron/local-db.ts`, nên test lại luồng import/link/unlink asset
-- Nên tăng version trong `package.json` trước khi tạo tag release mới
+**Made with ❤️ for creators and developers**
