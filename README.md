@@ -1,15 +1,14 @@
 <div align="center">
 	<img src="./icon.png" alt="Source Hub Logo" width="120" />
+<h1>Source Hub</h1>
+<p>Smart media asset management for creators — built with Electron, React, and local-first architecture.</p>
 
-	<h1>Source Hub</h1>
-	<p>Smart media asset management for creators — built with Electron, React, and local-first architecture.</p>
-
-	<p>
-		<a href="https://github.com/HyIsNoob/Source-Hub"><img alt="Repo" src="https://img.shields.io/badge/GitHub-Source--Hub-000?logo=github" /></a>
-		<img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue" />
-		<img alt="License" src="https://img.shields.io/badge/license-MIT-green" />
-		<img alt="Electron" src="https://img.shields.io/badge/Electron-41.x-47848F?logo=electron" />
-	</p>
+<p>
+	<a href="https://github.com/HyIsNoob/Source-Hub"><img alt="Repo" src="https://img.shields.io/badge/GitHub-Source--Hub-000?logo=github" /></a>
+	<img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue" />
+	<img alt="License" src="https://img.shields.io/badge/license-MIT-green" />
+	<img alt="Electron" src="https://img.shields.io/badge/Electron-41.x-47848F?logo=electron" />
+</p>
 </div>
 
 ---
@@ -17,6 +16,8 @@
 ## Overview
 
 Source Hub is a lightweight yet powerful desktop app designed for video editors, producers, and creative professionals who need to organize, manage, and access media assets efficiently. With support for projects, collections, and intelligent asset management, Source Hub streamlines the workflow from file import to production.
+
+<img width="1917" height="986" alt="image" src="https://github.com/user-attachments/assets/bc90438e-154f-4c1e-b3d9-077cd9e95c65" />
 
 ### Key Features
 
@@ -29,8 +30,11 @@ Source Hub is a lightweight yet powerful desktop app designed for video editors,
 - **Local Database** – All data stored locally using SQLite3 for privacy and offline access
 - **Windows Installer** – Professional NSIS-based installer for easy deployment
 
-![Screenshot placeholder - Project view](https://via.placeholder.com/1200x700?text=Source+Hub+Project+View)
-![Screenshot placeholder - Collections](https://via.placeholder.com/1200x700?text=Source+Hub+Collections)
+<img width="1913" height="982" alt="image" src="https://github.com/user-attachments/assets/3099b8cd-16ae-47c8-923a-0085b2afadbc" />
+
+<img width="1919" height="988" alt="image" src="https://github.com/user-attachments/assets/28c68850-7f7b-4604-8c91-7ddfcbf140ba" />
+
+<img width="1919" height="984" alt="image" src="https://github.com/user-attachments/assets/376c56c2-39be-4dde-a1a8-6900984e858e" />
 
 ## System Requirements
 
@@ -51,9 +55,9 @@ Download the latest installer from [GitHub Releases](https://github.com/HyIsNoob
 source-hub/
 ├── src/                      # React UI components
 ├── electron/                 # Electron main process & database
-│   ├── main.ts              # Electron app bootstrap & IPC
-│   ├── preload.ts           # Preload script for IPC security
-│   └── local-db.ts          # SQLite3 database management
+│   ├── main.ts               # Electron app bootstrap & IPC
+│   ├── preload.ts            # Preload script for IPC security
+│   └── local-db.ts           # SQLite3 database management
 ├── public/                   # Static assets (icons, images)
 ├── .github/                  # CI/CD workflows
 │   └── workflows/
